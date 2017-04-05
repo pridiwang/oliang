@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">O-Liang</string>
+    <string name="open_drawer">Open Menu</string>
+    <string name="close_drawer">Close Menu</string>
+
+
+    <string name="hello_blank_fragment">Hello</string>
+</resources>

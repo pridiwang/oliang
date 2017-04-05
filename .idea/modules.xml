@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/EVPLibrary/EVPLibrary.iml" filepath="$PROJECT_DIR$/EVPLibrary/EVPLibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TheCheeseLibrary/TheCheeseLibrary.iml" filepath="$PROJECT_DIR$/TheCheeseLibrary/TheCheeseLibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/YouTubePlayer/YouTubePlayer.iml" filepath="$PROJECT_DIR$/YouTubePlayer/YouTubePlayer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oliang.iml" filepath="$PROJECT_DIR$/oliang.iml" />
+    </modules>
+  </component>
+</project>
