@@ -37,8 +37,8 @@ dependencies {
     compile 'org.jsoup:jsoup:1.10.2'
     compile 'com.github.PierfrancescoSoffritti:AndroidYouTubePlayer:0.7.2'
     compile 'com.google.firebase:firebase-core:10.0.1'
-    testCompile 'junit:junit:4.12'
     compile 'net.gotev:uploadservice:3.2.3'
+    testCompile 'junit:junit:4.12'
 }
 
 apply plugin: 'com.google.gms.google-services'
