@@ -1,9 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
     tools:context="net.pridi.oliang.activity.PostActivity">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:text="Post New Post"
+        />
+<EditText
+    android:id="@+id/etTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="Title"
 
-</android.support.constraint.ConstraintLayout>
+    />
+    <EditText
+        android:id="@+id/etContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lines="5"
+        android:hint="Content"
+
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <Button android:id="@+id/btnImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="อัพโหลดรูปภาพ"
+            ></Button>
+        <Button android:id="@+id/btnVdo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="อัพโหลดวิดีโอ"
+            ></Button>
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post"
+
+        />
+
+    </LinearLayout>
+</LinearLayout>
