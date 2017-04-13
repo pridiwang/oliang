@@ -35,12 +35,17 @@
         <Button android:id="@+id/btnImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="อัพโหลดรูปภาพ"
+            android:text="รูปภาพ"
+            ></Button>
+        <Button android:id="@+id/btnImgCam"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ถ่ายรูป"
             ></Button>
         <Button android:id="@+id/btnVdo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="อัพโหลดวิดีโอ"
+            android:text="วิดีโอ"
             ></Button>
     <Button
         android:id="@+id/btnSubmit"

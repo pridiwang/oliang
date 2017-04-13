@@ -1,10 +1,17 @@
 package net.pridi.oliang.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.ButtonBarLayout;
@@ -28,7 +35,10 @@ import net.pridi.oliang.manager.http.ServiceGenerator;
 import net.pridi.oliang.utils.FileUtils;
 import net.pridi.oliang.view.AndroidPermissions;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -43,6 +53,9 @@ import retrofit2.http.Multipart;
 public class PostActivity extends AppCompatActivity {
     public static final int PICK_IMAGE = 100;
     public static final int PICK_VDO = 200;
+    private static final int REQUEST_VIDEO_CAPTURE = 300;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private String pathToStoredVideo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +75,7 @@ public class PostActivity extends AppCompatActivity {
 
             }
         });
+
         Button btnImage = (Button) findViewById(R.id.btnImage);
         btnImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,15 +87,27 @@ public class PostActivity extends AppCompatActivity {
 
             }
         });
+
+        Button btnImgCam = (Button) findViewById(R.id.btnImgCam);
+        btnImgCam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                }
+            }
+        });
+
+
         Button btnVdo = (Button) findViewById(R.id.btnVdo);
         btnVdo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("vdo/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Vdo"), PICK_VDO);
-
+                Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                if(intent.resolveActivity(getPackageManager())!=null) {
+                    startActivityForResult(intent, REQUEST_VIDEO_CAPTURE);
+                }
 
             }
         });
@@ -112,13 +138,59 @@ public class PostActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("API"," on Result "+resultCode+ " RESULT_OK "+RESULT_OK);
         Uri u= data.getData();
-        Log.d("API"," before uploadFile ");
+        Log.d("API"," before uploadFile resultCode:"+resultCode+" requestCode:"+requestCode);
+        if(resultCode==RESULT_OK){
+            if(requestCode==PICK_IMAGE) {
+                Log.d("API"," uploading Image ");
 
-        uploadFile(u);
+            }
+            if(requestCode==REQUEST_IMAGE_CAPTURE) {
+                Bundle extras = data.getExtras();
+                Bitmap imgBitmap = (Bitmap) extras.get("data");
+                u=getImageUri(this,imgBitmap);
+                Log.d("API"," uploading from Camera Image ");
+
+            }
+            if(requestCode==REQUEST_VIDEO_CAPTURE){
+                //pathToStoredVideo = getRealPathFromURIPath(u, PostActivity.this);
+                //uploadVideoToServer(pathToStoredVideo);
+
+                Log.d("API"," uploading VDO ");
+
+            }
+            uploadFile(u);
+        }
+
         Log.d("API"," after uploadFile ");
 
     }
+    private void uploadVideoToServer(String pathToVideoFile){
+        Log.d("API"," start uploadFile pathtovdofile "+pathToVideoFile.toString());
+        File videoFile = new File(pathToVideoFile);
+        Log.d("API"," start uploadFile vdofile "+videoFile.toString());
+        RequestBody requestFile = RequestBody.create(MediaType.parse("video/*"), videoFile);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("userfile", videoFile.getName(), requestFile);
+        Log.d("API"," body "+body.toString());
+        String descriptionString = "userfile";
+        RequestBody description =
+                RequestBody.create(
+                        okhttp3.MultipartBody.FORM, descriptionString);
+        Log.d("API"," description "+description.toString());
+        Call<ResponseBody> call = HttpManager.getInstance().getService().upload(description, body);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.d("API"," on Response response"+response.toString());
 
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d("API"," on Failure"+t.getMessage());
+            }
+        });
+
+    }
     private void uploadFile(Uri fileUri) {
         Log.d("API"," start uploadFile fileUri "+fileUri);
         // create upload service client
@@ -136,7 +208,7 @@ public class PostActivity extends AppCompatActivity {
 
         // MultipartBody.Part is used to send also the actual file name
         MultipartBody.Part body =
-                MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
+                MultipartBody.Part.createFormData("userfile", file.getName(), requestFile);
 
         // add another part within the multipart request
         String descriptionString = "userfile";
@@ -144,7 +216,9 @@ public class PostActivity extends AppCompatActivity {
                 RequestBody.create(
                         okhttp3.MultipartBody.FORM, descriptionString);
 
+        Log.d("API","body "+body.toString() );
         // finally, execute the request
+
         Call<ResponseBody> call = HttpManager.getInstance().getService().upload(description, body);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -158,5 +232,45 @@ public class PostActivity extends AppCompatActivity {
                 Log.e("Upload error:", t.getMessage());
             }
         });
+    }
+    private String getRealPathFromURIPath(Uri contentURI, Activity activity) {
+        Cursor cursor = activity.getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) {
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
+        }
+    }
+    String mCurrentPhotoPath;
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+    public String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Video.Media.DATA };
+        Cursor cursor = managedQuery(contentUri, proj, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
     }
 }

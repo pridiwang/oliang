@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "net.pridi.oliang"
-        minSdkVersion 19
+        minSdkVersion 24
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"

@@ -40,5 +40,6 @@ public interface ApiService {
             @Part("name") RequestBody name,
             @Part MultipartBody.Part file
     );
+
 }
 
