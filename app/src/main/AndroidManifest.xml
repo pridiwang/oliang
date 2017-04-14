@@ -27,7 +27,13 @@
         </activity>
         <activity
             android:name=".activity.MainActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".activity.DetailActivity"
             android:theme="@style/AppThemeWithActionBard" />
@@ -42,11 +48,7 @@
 
         <activity android:name=".activity.Mp4Activity" />
         <activity android:name=".activity.PostActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
 
         </activity>
 

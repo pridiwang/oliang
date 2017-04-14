@@ -7,6 +7,8 @@
     android:orientation="vertical"
     android:padding="16dp"
     tools:context="net.pridi.oliang.activity.PostActivity">
+
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content" 
@@ -16,17 +18,19 @@
     android:id="@+id/etTitle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:hint="Title"
+    android:hint="เรื่อง"
 
     />
     <EditText
         android:id="@+id/etContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:lines="5"
-        android:hint="Content"
+        android:inputType="textMultiLine"
+        android:hint="เนื้อหา"
 
         />
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -56,4 +60,11 @@
         />
 
     </LinearLayout>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbarStyle="insideInset"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        />
 </LinearLayout>

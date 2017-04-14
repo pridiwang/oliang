@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.icu.text.SimpleDateFormat;
+
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -19,6 +19,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.UploadNotificationConfig;
@@ -33,6 +35,7 @@ import net.pridi.oliang.manager.http.ApiService;
 import net.pridi.oliang.manager.http.FileUploadService;
 import net.pridi.oliang.manager.http.ServiceGenerator;
 import net.pridi.oliang.utils.FileUtils;
+import net.pridi.oliang.utils.ProgressRequestBody;
 import net.pridi.oliang.view.AndroidPermissions;
 
 import java.io.ByteArrayOutputStream;
@@ -50,28 +53,34 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.http.Multipart;
 
-public class PostActivity extends AppCompatActivity {
+public class PostActivity extends AppCompatActivity implements ProgressRequestBody.UploadCallbacks {
     public static final int PICK_IMAGE = 100;
     public static final int PICK_VDO = 200;
-    private static final int REQUEST_VIDEO_CAPTURE = 300;
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
-    private String pathToStoredVideo;
+    private static final int REQUEST_VIDEO_CAPTURE = 400;
+    private static final int REQUEST_IMAGE_CAPTURE = 300;
+    private String strImage="";
+    private String strVdo="";
+    ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         final EditText etTitle = (EditText) findViewById(R.id.etTitle);
         final EditText etContent= (EditText) findViewById(R.id.etContent);
+
         Button btnSubmit = (Button) findViewById(R.id.btnSubmit);
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String title = etTitle.getText().toString().trim();
                 String content = etContent.getText().toString().trim();
+
                 PostNewDao dao= new PostNewDao();
                 dao.setTitle(title);
                 dao.setContent(content);
-                sendPost(title,content);
+                sendPost(title,content,strImage,strVdo);
 
             }
         });
@@ -115,9 +124,9 @@ public class PostActivity extends AppCompatActivity {
 
     }
 
-    private void sendPost(String title,String content) {
+    private void sendPost(String title,String content,String image,String vdo) {
         Log.d("API"," sending ");
-        Call<PostItemDao> call = HttpManager.getInstance().getService().postNewPost(title,content);
+        Call<PostItemDao> call = HttpManager.getInstance().getService().postNewPost(title,content,strImage,strVdo);
         Log.d("API"," calling ");
         call.enqueue(new Callback<PostItemDao>() {
             @Override
@@ -138,6 +147,8 @@ public class PostActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("API"," on Result "+resultCode+ " RESULT_OK "+RESULT_OK);
         Uri u= data.getData();
+        //String fileName=u.getLastPathSegment();
+
         Log.d("API"," before uploadFile resultCode:"+resultCode+" requestCode:"+requestCode);
         if(resultCode==RESULT_OK){
             if(requestCode==PICK_IMAGE) {
@@ -158,47 +169,23 @@ public class PostActivity extends AppCompatActivity {
                 Log.d("API"," uploading VDO ");
 
             }
-            uploadFile(u);
+            uploadFile(u,requestCode);
         }
 
         Log.d("API"," after uploadFile ");
 
     }
-    private void uploadVideoToServer(String pathToVideoFile){
-        Log.d("API"," start uploadFile pathtovdofile "+pathToVideoFile.toString());
-        File videoFile = new File(pathToVideoFile);
-        Log.d("API"," start uploadFile vdofile "+videoFile.toString());
-        RequestBody requestFile = RequestBody.create(MediaType.parse("video/*"), videoFile);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("userfile", videoFile.getName(), requestFile);
-        Log.d("API"," body "+body.toString());
-        String descriptionString = "userfile";
-        RequestBody description =
-                RequestBody.create(
-                        okhttp3.MultipartBody.FORM, descriptionString);
-        Log.d("API"," description "+description.toString());
-        Call<ResponseBody> call = HttpManager.getInstance().getService().upload(description, body);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.d("API"," on Response response"+response.toString());
-
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.d("API"," on Failure"+t.getMessage());
-            }
-        });
-
-    }
-    private void uploadFile(Uri fileUri) {
+    private void uploadFile(Uri fileUri, final int requestCode) {
         Log.d("API"," start uploadFile fileUri "+fileUri);
         // create upload service client
         // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
         // use the FileUtils to get the actual file by uri
 
         File file = FileUtils.getFile(this, fileUri);
-        Log.d("API","file "+file);
+        Log.d("API","file:"+file);
+        final String fileName=file.getName();
+        Log.d("API"," filename:"+fileName);
+
         // create RequestBody instance from file
         RequestBody requestFile =
                 RequestBody.create(
@@ -206,6 +193,7 @@ public class PostActivity extends AppCompatActivity {
                         file
                 );
 
+        ProgressRequestBody fileBody= new ProgressRequestBody(file,this);
         // MultipartBody.Part is used to send also the actual file name
         MultipartBody.Part body =
                 MultipartBody.Part.createFormData("userfile", file.getName(), requestFile);
@@ -225,6 +213,16 @@ public class PostActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call,
                                    Response<ResponseBody> response) {
                 Log.v("Upload", "success "+response.toString());
+                fileName.replace(" ","_");
+                if( requestCode ==PICK_IMAGE){
+                    strImage=fileName;
+                }
+                if( requestCode ==REQUEST_IMAGE_CAPTURE){
+                    strImage=fileName;
+                }
+                if( requestCode ==REQUEST_VIDEO_CAPTURE){
+                    strVdo=fileName;
+                }
             }
 
             @Override
@@ -233,6 +231,22 @@ public class PostActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onProgressUpdate(int percentage) {
+        progressBar.setProgress(percentage);
+    }
+
+    @Override
+    public void onError() {
+        // do something;
+    }
+
+    @Override
+    public void onFinish() {
+        progressBar.setProgress(100);
+    }
+
     private String getRealPathFromURIPath(Uri contentURI, Activity activity) {
         Cursor cursor = activity.getContentResolver().query(contentURI, null, null, null, null);
         if (cursor == null) {
@@ -243,34 +257,10 @@ public class PostActivity extends AppCompatActivity {
             return cursor.getString(idx);
         }
     }
-    String mCurrentPhotoPath;
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
-    }
-    public String getRealPathFromURI(Uri contentUri) {
-        String[] proj = { MediaStore.Video.Media.DATA };
-        Cursor cursor = managedQuery(contentUri, proj, null, null, null);
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
     }
 }
