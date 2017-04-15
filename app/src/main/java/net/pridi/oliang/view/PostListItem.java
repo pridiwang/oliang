@@ -23,6 +23,7 @@ public class PostListItem extends BaseCustomViewGroup {
     TextView tvTitle;
     TextView tvDetail;
     ImageView ivImg;
+    TextView tvCatName;
 
     public PostListItem(Context context) {
         super(context);
@@ -61,6 +62,7 @@ public class PostListItem extends BaseCustomViewGroup {
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         tvDetail = (TextView) findViewById(R.id.tvDetail);
         ivImg=(ImageView) findViewById(R.id.ivImg);
+        tvCatName=(TextView) findViewById(R.id.tvCategoryName);
 
     }
 
@@ -70,6 +72,7 @@ public class PostListItem extends BaseCustomViewGroup {
     public void setDetailText(String text) {
         tvDetail.setText(text);
     }
+    public void setCatName(String text) {tvCatName.setText(text);}
     public void setImgUrl(String text) {
         Glide.with(Contextor.getInstance().getContext())
                 .load(text)

@@ -25,7 +25,7 @@ public class MutableInteger {
         bundle.putInt("value",value);
         return bundle;
     }
-    public void onRestoreInstanceSate(Bundle savedInstanceState){
+    public void onRestoreInstanceState(Bundle savedInstanceState){
         value= savedInstanceState.getInt("value");
     }
 }

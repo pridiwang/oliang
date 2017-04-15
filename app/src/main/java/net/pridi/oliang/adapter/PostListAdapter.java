@@ -81,6 +81,7 @@ public class PostListAdapter extends BaseAdapter {
         PostItemDao dao=  (PostItemDao) getItem(position);
         item.setTitleText(dao.getTitle());
         //item.setDetailText(dao.getContent());
+        item.setCatName(dao.getCategory());
         item.setImgUrl(dao.getImg());
         if(position>lastPositionInteger.getValue()) {
             Animation anim = AnimationUtils.loadAnimation(parent.getContext(),

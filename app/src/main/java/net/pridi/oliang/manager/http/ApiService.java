@@ -4,6 +4,7 @@ import net.pridi.oliang.dao.CatItemCollectionDao;
 import net.pridi.oliang.dao.PostItemCollectionDao;
 import net.pridi.oliang.dao.PostItemDao;
 import net.pridi.oliang.dao.PostNewDao;
+import net.pridi.oliang.datatype.MutableInteger;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -24,6 +25,9 @@ import retrofit2.http.Path;
 public interface ApiService {
     @POST("posts")
     Call<PostItemCollectionDao> loadPostList();
+
+    @POST("catposts/{id}")
+    Call<PostItemCollectionDao> loadCatPostList(@Path("id") MutableInteger id);
 
     @POST("catlist")
     Call<CatItemCollectionDao> loadCatList();

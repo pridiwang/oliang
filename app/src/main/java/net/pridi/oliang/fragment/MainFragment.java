@@ -44,6 +44,7 @@ public class MainFragment extends Fragment {
     PostListManager postListManager;
     Button btnNewPosts;
     MutableInteger lastPositionInteger;
+    MutableInteger categoryId;
     //function
     public MainFragment() {
         super();
@@ -60,7 +61,7 @@ public class MainFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        //init fragement
+        //init fragment
         init(savedInstanceState);
         if( savedInstanceState!=null)
             onRestoreInstanceState(savedInstanceState);
@@ -77,6 +78,7 @@ public class MainFragment extends Fragment {
         // Init fragment level variable
         postListManager= new PostListManager();
         lastPositionInteger=new MutableInteger(-1);
+        categoryId=new MutableInteger(1);
 
     }
 
@@ -120,7 +122,7 @@ public class MainFragment extends Fragment {
         if(isLoadingMore)
             return;
         isLoadingMore=true;
-        Call<PostItemCollectionDao> call = HttpManager.getInstance().getService().loadPostList();
+        Call<PostItemCollectionDao> call = HttpManager.getInstance().getService().loadCatPostList(categoryId);
         call.enqueue(new PostListLoadCallback(PostListLoadCallback.MODE_RELOAD));
     }
 
@@ -146,13 +148,16 @@ public class MainFragment extends Fragment {
                 postListManager.onSaveInstanceState());
         outState.putBundle("lastPositionInteger",
                 lastPositionInteger.onSaveInstanceState());
+        outState.putBundle("categoryId",
+                categoryId.onSaveInstanceState());
     }
 
 
     private void onRestoreInstanceState(Bundle savedIntanceState){
         // restore instance state
         postListManager.onRestoreInstanceState(savedIntanceState.getBundle("postListManager"));
-        lastPositionInteger.onRestoreInstanceSate(savedIntanceState.getBundle("lastPositionInteger"));
+        lastPositionInteger.onRestoreInstanceState(savedIntanceState.getBundle("lastPositionInteger"));
+        categoryId.onRestoreInstanceState(savedIntanceState.getBundle("categoryId"));
     }
 
     /*
