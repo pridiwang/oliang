@@ -36,7 +36,7 @@
         </activity>
         <activity
             android:name=".activity.DetailActivity"
-            android:theme="@style/AppThemeWithActionBard" />
+            android:theme="@style/AppThemeWithActionBar" />
         <activity
             android:name=".activity.ClipActivity"
             android:screenOrientation="landscape"
@@ -47,7 +47,8 @@
             android:value="GlideModule" />
 
         <activity android:name=".activity.Mp4Activity" />
-        <activity android:name=".activity.PostActivity" >
+        <activity android:name=".activity.PostActivity"
+            >
 
 
         </activity>

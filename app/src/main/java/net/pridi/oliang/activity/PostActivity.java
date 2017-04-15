@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -15,10 +16,14 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.ButtonBarLayout;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -58,18 +63,35 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
     public static final int PICK_VDO = 200;
     private static final int REQUEST_VIDEO_CAPTURE = 400;
     private static final int REQUEST_IMAGE_CAPTURE = 300;
+    EditText etTitle ;
+    EditText etContent;
     private String strImage="";
     private String strVdo="";
+    private Toolbar toolbar;
     ProgressBar progressBar;
-
+    ImageView ivThumbImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        final EditText etTitle = (EditText) findViewById(R.id.etTitle);
-        final EditText etContent= (EditText) findViewById(R.id.etContent);
 
+        initInstance();
+
+    }
+
+    private void initInstance() {
+
+
+        toolbar=(Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        etTitle = (EditText) findViewById(R.id.etTitle);
+        etContent= (EditText) findViewById(R.id.etContent);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        ivThumbImage= (ImageView) findViewById(R.id.ivThumbImage);
         Button btnSubmit = (Button) findViewById(R.id.btnSubmit);
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,7 +125,7 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (intent.resolveActivity(getPackageManager()) != null) {
-                        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
                 }
             }
         });
@@ -120,8 +142,6 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
 
             }
         });
-
-
     }
 
     private void sendPost(String title,String content,String image,String vdo) {
@@ -132,6 +152,7 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
             @Override
             public void onResponse(Call<PostItemDao> call, Response<PostItemDao> response) {
                 Log.d("API","on Response");
+                finish();
             }
 
             @Override
@@ -154,12 +175,15 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
             if(requestCode==PICK_IMAGE) {
                 Log.d("API"," uploading Image ");
 
+
             }
             if(requestCode==REQUEST_IMAGE_CAPTURE) {
                 Bundle extras = data.getExtras();
                 Bitmap imgBitmap = (Bitmap) extras.get("data");
                 u=getImageUri(this,imgBitmap);
                 Log.d("API"," uploading from Camera Image ");
+                ivThumbImage.setImageBitmap(imgBitmap);
+
 
             }
             if(requestCode==REQUEST_VIDEO_CAPTURE){
@@ -262,5 +286,31 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_post,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.action_post){
+            String title = etTitle.getText().toString().trim();
+            String content = etContent.getText().toString().trim();
+
+            PostNewDao dao= new PostNewDao();
+            dao.setTitle(title);
+            dao.setContent(content);
+            sendPost(title,content,strImage,strVdo);
+            return true;
+        }
+        if(item.getItemId()== android.R.id.home){
+            finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

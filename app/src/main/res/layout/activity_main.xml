@@ -35,10 +35,22 @@
         android:layout_width="@dimen/drawer_menu_width"
         android:layout_height="match_parent">
         <Button
-            android:id="@+id/testButton"
+            android:id="@+id/btnPostNew"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="test button"/>
+            android:text="Post New"/>
+        <ListView
+            android:id="@+id/lvCatList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+
+            >
+
+
+
+
+        </ListView>
 
 
     </LinearLayout>

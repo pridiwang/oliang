@@ -8,21 +8,39 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 
 import net.pridi.oliang.R;
+import net.pridi.oliang.adapter.CatListAdapter;
+import net.pridi.oliang.dao.CatItemCollectionDao;
 import net.pridi.oliang.dao.PostItemDao;
 import net.pridi.oliang.fragment.MainFragment;
+import net.pridi.oliang.manager.HttpManager;
+import net.pridi.oliang.manager.http.ApiService;
+
+import java.util.LinkedList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.FragmentListener {
     private FirebaseAnalytics mFirebaseAnalytics;
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
+    Button btnPostNew;
+    private ListView lvCatList;
+    private CatListAdapter catListAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,11 +51,23 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
                     .add(R.id.contentContainer, MainFragment.newInstance())
                     .commit();
         }
+        btnPostNew = (Button) findViewById(R.id.btnPostNew);
+        btnPostNew.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this,PostActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
     }
 
     private void initInstance() {
+        lvCatList = (ListView) findViewById(R.id.lvCatList);
+        catListAdapter = new CatListAdapter();
+        lvCatList.setAdapter(catListAdapter);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawerLayout= (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -50,6 +80,22 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Call<CatItemCollectionDao> call = HttpManager.getInstance().getService().loadCatList();
+        call.enqueue(new Callback<CatItemCollectionDao>() {
+            @Override
+            public void onResponse(Call<CatItemCollectionDao> call, Response<CatItemCollectionDao> response) {
+                if(response.isSuccessful()) {
+                    catListAdapter.setDao(response.body());
+                    lvCatList.setAdapter(catListAdapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CatItemCollectionDao> call, Throwable t) {
+                Log.d("Error", t.getMessage());
+            }
+        });
+
     }
 
     @Override

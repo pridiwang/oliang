@@ -1,5 +1,6 @@
 package net.pridi.oliang.manager.http;
 
+import net.pridi.oliang.dao.CatItemCollectionDao;
 import net.pridi.oliang.dao.PostItemCollectionDao;
 import net.pridi.oliang.dao.PostItemDao;
 import net.pridi.oliang.dao.PostNewDao;
@@ -23,6 +24,9 @@ import retrofit2.http.Path;
 public interface ApiService {
     @POST("posts")
     Call<PostItemCollectionDao> loadPostList();
+
+    @POST("catlist")
+    Call<CatItemCollectionDao> loadCatList();
 
     @POST("newposts/{id}")
     Call<PostItemCollectionDao> loadNewPostList(@Path("id") int id);
