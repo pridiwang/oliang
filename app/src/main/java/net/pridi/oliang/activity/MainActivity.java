@@ -2,7 +2,9 @@ package net.pridi.oliang.activity;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.sip.SipAudioCall;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -22,8 +25,11 @@ import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 import net.pridi.oliang.R;
 import net.pridi.oliang.adapter.CatListAdapter;
 import net.pridi.oliang.dao.CatItemCollectionDao;
+import net.pridi.oliang.dao.CatItemDao;
 import net.pridi.oliang.dao.PostItemDao;
+import net.pridi.oliang.datatype.MutableInteger;
 import net.pridi.oliang.fragment.MainFragment;
+import net.pridi.oliang.manager.CatListManager;
 import net.pridi.oliang.manager.HttpManager;
 import net.pridi.oliang.manager.http.ApiService;
 
@@ -41,15 +47,22 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
     Button btnPostNew;
     private ListView lvCatList;
     private CatListAdapter catListAdapter;
+    CatListManager catListManager;
+    MutableInteger categoryId;
+    public Integer catid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initInstance();
         if(savedInstanceState==null) {
+            //categoryId.setValue(2);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.contentContainer, MainFragment.newInstance())
+                    .add(R.id.contentContainer, MainFragment.newInstance(),"main_fragment")
                     .commit();
+
+        }else{
+
         }
         btnPostNew = (Button) findViewById(R.id.btnPostNew);
         btnPostNew.setOnClickListener(new View.OnClickListener() {
@@ -64,10 +77,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
     }
 
     private void initInstance() {
+        categoryId= new MutableInteger(0);
         lvCatList = (ListView) findViewById(R.id.lvCatList);
         catListAdapter = new CatListAdapter();
         lvCatList.setAdapter(catListAdapter);
-
+        catid=0;
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawerLayout= (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -83,10 +97,30 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
         Call<CatItemCollectionDao> call = HttpManager.getInstance().getService().loadCatList();
         call.enqueue(new Callback<CatItemCollectionDao>() {
             @Override
-            public void onResponse(Call<CatItemCollectionDao> call, Response<CatItemCollectionDao> response) {
+            public void onResponse(final Call<CatItemCollectionDao> call, Response<CatItemCollectionDao> response) {
                 if(response.isSuccessful()) {
                     catListAdapter.setDao(response.body());
+                    //catListManager.setDao(response.body());
                     lvCatList.setAdapter(catListAdapter);
+                    lvCatList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Integer catid=catListAdapter.getDao().getData().get(position).getId();
+                            Log.d("CLK","id:"+catid);
+
+                            //CatItemDao dao= catListAdapter.getInstance().getDao().getData().get(position);
+                            Bundle bundle=new Bundle();
+                            categoryId.setValue(catid);
+                            bundle.putInt("catid",catid);
+                            MainFragment fraginfo= new MainFragment();
+                            fraginfo.setArguments(bundle);
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.contentContainer,fraginfo,"main_fragment")
+                                    .commit();
+                            ;
+                            drawerLayout.closeDrawers();
+                        }
+                    });
                 }
             }
 
@@ -143,4 +177,16 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    public Integer getCatid() {
+        return catid;
+    }
+
+    public void setCatid(Integer catid) {
+        this.catid = catid;
+    }
 }

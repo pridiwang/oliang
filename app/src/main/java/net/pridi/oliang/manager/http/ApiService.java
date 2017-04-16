@@ -26,17 +26,17 @@ public interface ApiService {
     @POST("posts")
     Call<PostItemCollectionDao> loadPostList();
 
-    @POST("catposts/{id}")
-    Call<PostItemCollectionDao> loadCatPostList(@Path("id") MutableInteger id);
+    @POST("catposts/{catid}")
+    Call<PostItemCollectionDao> loadCatPostList(@Path("catid") Integer catid);
 
     @POST("catlist")
     Call<CatItemCollectionDao> loadCatList();
 
-    @POST("newposts/{id}")
-    Call<PostItemCollectionDao> loadNewPostList(@Path("id") int id);
+    @POST("newposts/{catid}/{id}")
+    Call<PostItemCollectionDao> loadNewPostList(@Path("catid") Integer catid,@Path("id") int id);
 
-    @POST("oldposts/{id}")
-    Call<PostItemCollectionDao> loadOldPostList(@Path("id") int id);
+    @POST("oldposts/{catid}/{id}")
+    Call<PostItemCollectionDao> loadOldPostList(@Path("catid") Integer catid,@Path("id") int id);
 
     @FormUrlEncoded
     @POST("postnew")

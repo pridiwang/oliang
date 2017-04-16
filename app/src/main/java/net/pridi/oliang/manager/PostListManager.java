@@ -25,7 +25,7 @@ public class PostListManager {
 
     public PostListManager() {
         mContext = Contextor.getInstance().getContext();
-        loadCache();
+        //loadCache();
 
     }
 
@@ -35,7 +35,7 @@ public class PostListManager {
 
     public void setDao(PostItemCollectionDao dao) {
         this.dao = dao;
-        saveCache();
+        //saveCache();
     }
 
     public int getLastId() {
@@ -79,7 +79,7 @@ public class PostListManager {
             dao.setData(new ArrayList<PostItemDao>());
 
         dao.getData().addAll(0, newDao.getData());
-        saveCache();
+        //saveCache();
     }
 
     public void appendDaoToBottom(PostItemCollectionDao newDao) {
@@ -89,7 +89,7 @@ public class PostListManager {
             dao.setData(new ArrayList<PostItemDao>());
 
         dao.getData().addAll(dao.getData().size(), newDao.getData());
-        saveCache();
+        //saveCache();
     }
 
     private void saveCache() {

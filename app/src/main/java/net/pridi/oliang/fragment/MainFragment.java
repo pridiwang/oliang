@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 import net.pridi.oliang.R;
+import net.pridi.oliang.activity.MainActivity;
 import net.pridi.oliang.adapter.PostListAdapter;
 import net.pridi.oliang.dao.PostItemCollectionDao;
 import net.pridi.oliang.dao.PostItemDao;
@@ -32,19 +33,22 @@ import retrofit2.Response;
 /**
  * Created by nuuneoi on 11/16/2014.
  */
+
 public class MainFragment extends Fragment {
     //variables
     public interface FragmentListener{
         void onPostItemClicked(PostItemDao dao);
+
     }
 
     ListView listView;
+
     PostListAdapter listAdapter;
     SwipeRefreshLayout swipeRefreshLayout;
     PostListManager postListManager;
     Button btnNewPosts;
     MutableInteger lastPositionInteger;
-    MutableInteger categoryId;
+    public MutableInteger categoryId;
     //function
     public MainFragment() {
         super();
@@ -78,12 +82,15 @@ public class MainFragment extends Fragment {
         // Init fragment level variable
         postListManager= new PostListManager();
         lastPositionInteger=new MutableInteger(-1);
-        categoryId=new MutableInteger(1);
-
+        Integer catid = this.getArguments().getInt("catid");
+        showToast("catid "+catid);
+        categoryId=new MutableInteger(catid);
     }
 
     private void initInstances(View rootView,Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
+
+        showToast("initInstance catid "+ categoryId.getValue());
         btnNewPosts = (Button) rootView.findViewById(R.id.btnNewPosts);
         btnNewPosts.setOnClickListener(buttonClickListener);
         listView = (ListView) rootView.findViewById(R.id.listView);
@@ -107,14 +114,15 @@ public class MainFragment extends Fragment {
     }
     private void reloadNewData() {
         int maxId=postListManager.getLastId();
-        Call<PostItemCollectionDao> call = HttpManager.getInstance().getService().loadNewPostList(maxId);
+        Call<PostItemCollectionDao> call = HttpManager.getInstance().getService().loadNewPostList(categoryId.getValue(),maxId);
         call.enqueue(new PostListLoadCallback(PostListLoadCallback.MODE_RELOAD_NEWER));
 
     }
     boolean isLoadingMore = false;
     private void reloadOldData() {
         int minId=postListManager.getOldId();
-        Call<PostItemCollectionDao> call = HttpManager.getInstance().getService().loadOldPostList(minId);
+        showToast("loading old for cat "+categoryId.getValue()+ "mind id "+minId);
+        Call<PostItemCollectionDao> call = HttpManager.getInstance().getService().loadOldPostList(categoryId.getValue(),minId);
         call.enqueue(new PostListLoadCallback(PostListLoadCallback.MODE_RELOAD_OLDER));
 
     }
@@ -122,7 +130,8 @@ public class MainFragment extends Fragment {
         if(isLoadingMore)
             return;
         isLoadingMore=true;
-        Call<PostItemCollectionDao> call = HttpManager.getInstance().getService().loadCatPostList(categoryId);
+        showToast("loading for cat "+categoryId.getValue());
+        Call<PostItemCollectionDao> call = HttpManager.getInstance().getService().loadCatPostList(categoryId.getValue());
         call.enqueue(new PostListLoadCallback(PostListLoadCallback.MODE_RELOAD));
     }
 
@@ -305,6 +314,11 @@ public class MainFragment extends Fragment {
             if(mode==MODE_RELOAD_OLDER)
                 isLoadingMore=false;
         }
+    }
+    public void setCategoryId(int id){
+        categoryId.setValue(id);
+        reloadData();
+
     }
 
 }
