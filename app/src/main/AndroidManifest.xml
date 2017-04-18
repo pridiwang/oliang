@@ -10,7 +10,6 @@
 
     <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT"/>
     <uses-permission android:name="android.permission.CAPTURE_SECURE_VIDEO_OUTPUT"/>
-
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -19,6 +18,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service android:name=".utils.FireBaseRegist" >
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
         <activity android:name=".activity.SplashActivity"
             android:theme="@style/SplashTheme"
             >
@@ -54,5 +58,6 @@
         </activity>
 
     </application>
+
 
 </manifest>
