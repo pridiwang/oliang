@@ -21,11 +21,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.UploadNotificationConfig;
@@ -33,6 +38,8 @@ import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
 import net.pridi.oliang.Manifest;
 import net.pridi.oliang.R;
+import net.pridi.oliang.adapter.CatListAdapter;
+import net.pridi.oliang.dao.CatItemCollectionDao;
 import net.pridi.oliang.dao.PostItemDao;
 import net.pridi.oliang.dao.PostNewDao;
 import net.pridi.oliang.manager.HttpManager;
@@ -65,11 +72,14 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
     private static final int REQUEST_IMAGE_CAPTURE = 300;
     EditText etTitle ;
     EditText etContent;
+    private Spinner spCatgeogry;
     private String strImage="";
     private String strVdo="";
     private Toolbar toolbar;
     ProgressBar progressBar;
     ImageView ivThumbImage;
+    private CatListAdapter catListAdapter;
+    String catname;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +91,30 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
 
     private void initInstance() {
 
+        catListAdapter=new CatListAdapter();
+        spCatgeogry= (Spinner) findViewById(R.id.spCategory);
+
+        Call<CatItemCollectionDao> call = HttpManager.getInstance().getService().loadCatList();
+        call.enqueue(new Callback<CatItemCollectionDao>() {
+            @Override
+            public void onResponse(Call<CatItemCollectionDao> call, Response<CatItemCollectionDao> response) {
+                if(response.isSuccessful()) {
+                    if(response.body()!=null) {
+                        catListAdapter.setDao(response.body());
+                        spCatgeogry.setAdapter(catListAdapter);
+                        spCatgeogry.setSelection(2);
+                        showToast("catname: "+catListAdapter.getDao().getData().get((spCatgeogry.getSelectedItemPosition())).getId());
+                    }
+                }else{
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CatItemCollectionDao> call, Throwable t) {
+
+            }
+        });
 
         toolbar=(Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -96,14 +130,7 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String title = etTitle.getText().toString().trim();
-                String content = etContent.getText().toString().trim();
-
-                PostNewDao dao= new PostNewDao();
-                dao.setTitle(title);
-                dao.setContent(content);
-                sendPost(title,content,strImage,strVdo);
-
+                postNew();
             }
         });
 
@@ -144,9 +171,9 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         });
     }
 
-    private void sendPost(String title,String content,String image,String vdo) {
+    private void sendPost(int category,String title,String content,String image,String vdo) {
         Log.d("API"," sending ");
-        Call<PostItemDao> call = HttpManager.getInstance().getService().postNewPost(title,content,strImage,strVdo);
+        Call<PostItemDao> call = HttpManager.getInstance().getService().postNewPost(category,title,content,strImage,strVdo);
         Log.d("API"," calling ");
         call.enqueue(new Callback<PostItemDao>() {
             @Override
@@ -297,13 +324,7 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==R.id.action_post){
-            String title = etTitle.getText().toString().trim();
-            String content = etContent.getText().toString().trim();
-
-            PostNewDao dao= new PostNewDao();
-            dao.setTitle(title);
-            dao.setContent(content);
-            sendPost(title,content,strImage,strVdo);
+            postNew();
             return true;
         }
         if(item.getItemId()== android.R.id.home){
@@ -313,4 +334,18 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
 
         return super.onOptionsItemSelected(item);
     }
+    public void postNew(){
+        String title = etTitle.getText().toString().trim();
+        String content = etContent.getText().toString().trim();
+        int category= catListAdapter.getDao().getData().get((spCatgeogry.getSelectedItemPosition())).getId();
+        sendPost(category,title,content,strImage,strVdo);
+
+    }
+
+    private void showToast(String text){
+        Toast.makeText(Contextor.getInstance().getContext(),
+                text,
+                Toast.LENGTH_SHORT).show();
+    }
+
 }

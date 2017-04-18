@@ -10,10 +10,4 @@
     <string name="choose_file">Select a file</string>
     <string name="error_selecting_file">Error selecting File</string>
     <string name="internal_storage">Internal storage</string>
-
-    <string-array name="category_list">
-        <item >ทั่วไป</item>
-        <item >ข่าวประชาสัมพันธ์</item>
-
-    </string-array>
 </resources>

@@ -40,7 +40,8 @@ public interface ApiService {
 
     @FormUrlEncoded
     @POST("postnew")
-    Call<PostItemDao> postNewPost(@Field("title") String title,
+    Call<PostItemDao> postNewPost(@Field("category") int category,
+                                  @Field("title") String title,
                                   @Field("content") String content,
                                   @Field("image") String image,
                                   @Field("vdo") String vdo
