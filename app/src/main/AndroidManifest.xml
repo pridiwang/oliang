@@ -10,8 +10,10 @@
 
     <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT"/>
     <uses-permission android:name="android.permission.CAPTURE_SECURE_VIDEO_OUTPUT"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <application
         android:name=".MainApplication"
+        android:resizeableActivity="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -56,8 +58,10 @@
 
 
         </activity>
-
+        {% includecode github_path="firebase/quickstart-android/messaging/app/src/main/AndroidManifest.xml"
+        region_tag="fcm_default_icon" adjust_indentation="auto" github_link=True %}
     </application>
 
-
+    {% includecode github_path="firebase/quickstart-android/messaging/app/src/main/AndroidManifest.xml"
+    region_tag="firebase_service" adjust_indentation="auto" github_link=True %}
 </manifest>
