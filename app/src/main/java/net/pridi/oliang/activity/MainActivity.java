@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 
 import net.pridi.oliang.R;
@@ -32,6 +33,7 @@ import net.pridi.oliang.fragment.MainFragment;
 import net.pridi.oliang.manager.CatListManager;
 import net.pridi.oliang.manager.HttpManager;
 import net.pridi.oliang.manager.http.ApiService;
+import net.pridi.oliang.utils.FireBaseRegist;
 
 import java.util.LinkedList;
 
@@ -50,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
     CatListManager catListManager;
     MutableInteger categoryId;
     public Integer catid;
+    FireBaseRegist fbRegist = new FireBaseRegist();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
     }
 
     private void initInstance() {
+        FirebaseMessaging.getInstance().subscribeToTopic("newpost");
         categoryId= new MutableInteger(0);
         lvCatList = (ListView) findViewById(R.id.lvCatList);
         catListAdapter = new CatListAdapter();

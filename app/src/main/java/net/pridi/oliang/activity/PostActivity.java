@@ -247,7 +247,7 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         ProgressRequestBody fileBody= new ProgressRequestBody(file,this);
         // MultipartBody.Part is used to send also the actual file name
         MultipartBody.Part body =
-                MultipartBody.Part.createFormData("userfile", file.getName(), requestFile);
+                MultipartBody.Part.createFormData("userfile", file.getName(), fileBody);
 
         // add another part within the multipart request
         String descriptionString = "userfile";

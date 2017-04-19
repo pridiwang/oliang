@@ -54,5 +54,9 @@ public interface ApiService {
             @Part MultipartBody.Part file
     );
 
+
+    @POST("regtoken/{token}/{uuid}")
+    Call<Object> registerToken(@Path("token") String token,@Path("uuid") String uuid);
+
 }
 

@@ -28,7 +28,6 @@
     android:layout_height="match_parent" />
     </LinearLayout>
     <LinearLayout
-
         android:orientation="vertical"
         android:background="#ffffff"
         android:layout_gravity="start"
