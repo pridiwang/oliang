@@ -194,9 +194,11 @@ public class MainFragment extends Fragment {
 
     }
     private void showToast(String text){
-        Toast.makeText(Contextor.getInstance().getContext(),
+
+        /*Toast.makeText(Contextor.getInstance().getContext(),
                 text,
                 Toast.LENGTH_SHORT).show();
+                */
     }
     //listener
     final View.OnClickListener buttonClickListener = new View.OnClickListener() {

@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="net.pridi.oliang.activity.PostActivity">
+    tools:context="net.pridi.oliang.activity.PostActivity"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
+    >
 <android.support.v7.widget.Toolbar
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
@@ -32,7 +34,9 @@
     <ImageView
         android:id="@+id/ivThumbImage"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:maxHeight="60dp"
+        />
     <Spinner
         android:id="@+id/spCategory"
         android:layout_width="wrap_content"
@@ -76,6 +80,7 @@
             android:layout_height="wrap_content"
 
             android:drawableLeft="@drawable/ic_image_black_18dp"
+            android:visibility="gone"
             android:text="รูป"
             ></Button>
         <Button android:id="@+id/btnImgCam"

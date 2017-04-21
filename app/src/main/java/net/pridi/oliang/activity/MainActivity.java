@@ -104,7 +104,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
             public void onResponse(final Call<CatItemCollectionDao> call, Response<CatItemCollectionDao> response) {
                 if(response.isSuccessful()) {
                     catListAdapter.setDao(response.body());
-                    //catListManager.setDao(response.body());
+                   //catListManager.setDao(response.body());
+                    CatItemDao allCat= new CatItemDao();
+                    allCat.setId(0);
+                    allCat.setName("--ทั้งหมด--");
+                    catListAdapter.getDao().getData().add(allCat);
                     lvCatList.setAdapter(catListAdapter);
                     lvCatList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override

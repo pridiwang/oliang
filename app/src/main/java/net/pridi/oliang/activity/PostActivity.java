@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.ContactsContract;
@@ -80,6 +81,8 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
     ImageView ivThumbImage;
     private CatListAdapter catListAdapter;
     String catname;
+    Uri selectedImage;
+    private Uri imageUri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,8 +105,8 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                     if(response.body()!=null) {
                         catListAdapter.setDao(response.body());
                         spCatgeogry.setAdapter(catListAdapter);
-                        spCatgeogry.setSelection(2);
-                        showToast("catname: "+catListAdapter.getDao().getData().get((spCatgeogry.getSelectedItemPosition())).getId());
+                        spCatgeogry.setSelection(0);
+                        //showToast("catname: "+catListAdapter.getDao().getData().get((spCatgeogry.getSelectedItemPosition())).getId());
                     }
                 }else{
 
@@ -154,6 +157,17 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                 if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
                 }
+
+
+                /*String filename="tmp.jpg";
+                Intent camIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+                File photo = new File(Environment.getExternalStorageDirectory(), filename);
+                camIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(photo));
+                imageUri = Uri.fromFile(photo);
+                startActivityForResult(camIntent, REQUEST_IMAGE_CAPTURE);
+                */
+
             }
         });
 
@@ -218,6 +232,19 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                 //uploadVideoToServer(pathToStoredVideo);
 
                 Log.d("API"," uploading VDO ");
+                /* show clip thumbnail
+                MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();
+                try {
+                    metadataRetriever.setDataSource(getRealPathFromURIPath(u,this));
+                    String duration=metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                    long time=Long.valueOf(duration)/2;
+                    Bitmap bitmap = metadataRetriever.getFrameAtTime(time, MediaMetadataRetriever.OPTION_NEXT_SYNC);
+                    ivThumbImage.setImageBitmap(bitmap);
+
+                    //now convert to base64
+                } catch (Exception ex) {
+                }
+                */
 
             }
             uploadFile(u,requestCode);
