@@ -1,6 +1,7 @@
 package net.pridi.oliang.activity;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -54,6 +55,7 @@ import net.pridi.oliang.view.AndroidPermissions;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 import okhttp3.MediaType;
@@ -154,19 +156,8 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-                }
-
-
-                /*String filename="tmp.jpg";
-                Intent camIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-                File photo = new File(Environment.getExternalStorageDirectory(), filename);
-                camIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        Uri.fromFile(photo));
-                imageUri = Uri.fromFile(photo);
-                startActivityForResult(camIntent, REQUEST_IMAGE_CAPTURE);
-                */
+                //if (intent.resolveActivity(getPackageManager()) != null) {}
+                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
 
             }
         });
@@ -208,15 +199,15 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("API"," on Result "+resultCode+ " RESULT_OK "+RESULT_OK);
-        Uri u= data.getData();
+        Uri u = data.getData();
+
         //String fileName=u.getLastPathSegment();
 
         Log.d("API"," before uploadFile resultCode:"+resultCode+" requestCode:"+requestCode);
         if(resultCode==RESULT_OK){
             if(requestCode==PICK_IMAGE) {
+                u= data.getData();
                 Log.d("API"," uploading Image ");
-
-
             }
             if(requestCode==REQUEST_IMAGE_CAPTURE) {
                 Bundle extras = data.getExtras();
@@ -224,10 +215,9 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                 u=getImageUri(this,imgBitmap);
                 Log.d("API"," uploading from Camera Image ");
                 ivThumbImage.setImageBitmap(imgBitmap);
-
-
             }
             if(requestCode==REQUEST_VIDEO_CAPTURE){
+                u= data.getData();
                 //pathToStoredVideo = getRealPathFromURIPath(u, PostActivity.this);
                 //uploadVideoToServer(pathToStoredVideo);
 
