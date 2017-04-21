@@ -19,7 +19,7 @@
 </android.support.v7.widget.Toolbar>
 <LinearLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
 
@@ -33,14 +33,14 @@
         android:id="@+id/ivThumbImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-<Spinner
-    android:id="@+id/spCategory"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:padding="5sp"
-    >
+    <Spinner
+        android:id="@+id/spCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5sp"
+        >
 
-</Spinner>
+    </Spinner>
     <EditText
     android:id="@+id/etTitle"
     android:layout_width="match_parent"
@@ -57,36 +57,6 @@
 
         />
 
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
-        <Button android:id="@+id/btnImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="รูปภาพ"
-            ></Button>
-        <Button android:id="@+id/btnImgCam"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ถ่ายรูป"
-            ></Button>
-        <Button android:id="@+id/btnVdo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="วิดีโอ"
-            ></Button>
-    <Button
-        android:id="@+id/btnSubmit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Post"
-
-        />
-
-    </LinearLayout>
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="match_parent"
@@ -95,6 +65,42 @@
         style="@android:style/Widget.Material.ProgressBar.Horizontal"
         android:progress="5"
         />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+
+        >
+        <Button android:id="@+id/btnImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:drawableLeft="@drawable/ic_image_black_18dp"
+            android:text="รูป"
+            ></Button>
+        <Button android:id="@+id/btnImgCam"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_add_a_photo_black_18dp"
+            android:text="กล้อง"
+            ></Button>
+        <Button android:id="@+id/btnVdo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_video_call_black_18dp"
+            android:text="VDO"
+            ></Button>
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_send_black_18dp"
+android:text="ส่ง"
+
+        />
+
+    </LinearLayout>
+
 
 </LinearLayout>
 </LinearLayout>
