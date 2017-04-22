@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 
+import android.graphics.Path;
 import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
@@ -62,6 +63,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Time;
 import java.util.Date;
 
 import okhttp3.MediaType;
@@ -91,8 +93,14 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
     String catname;
     Uri selectedImage;
     private Uri mediaUri;
+    private Uri mHihgQualityImageUri;
     String mediaStr;
     private Bitmap imgBitmap;
+    File finalFile;
+    String filename = Environment.getExternalStorageDirectory().getPath() + "/test/testfile.jpg";
+    Uri imageUri = Uri.fromFile(new File(filename));
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +109,14 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
             strImage=savedInstanceState.getString("strImage");
             strVdo=savedInstanceState.getString("strVdo");
             imgBitmap=savedInstanceState.getParcelable("imgBitmap");
+            if (savedInstanceState.containsKey("mediaUri")) {
+                mediaUri=Uri.parse(savedInstanceState.getString("mediaUri"));
+
+            }
+            if (savedInstanceState.containsKey("mHiUri")) {
+                mHihgQualityImageUri=Uri.parse(savedInstanceState.getString("mHiUri"));
+
+            }
             if(imgBitmap!=null){
 
                 Log.d("API"," got bitmap");
@@ -117,10 +133,27 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         outState.putString("strImage",strImage);
         outState.putString("strVdo",strVdo);
         outState.putParcelable("imgBitmap",imgBitmap);
-
-
+        if(mediaUri!=null){
+            outState.putString("mediaUri",mediaUri.toString());
+        }
+        if(mHihgQualityImageUri!=null) outState.putString("mHiUri",mHihgQualityImageUri.toString());
+        Log.d("API"," saveInstance mediaUri "+mediaUri+" mHi: "+mHihgQualityImageUri);
         super.onSaveInstanceState(outState);
     }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState.containsKey("mediaUri")) {
+            mediaUri=Uri.parse(savedInstanceState.getString("mediaUri"));
+
+        }
+        if (savedInstanceState.containsKey("mHiUri")) {
+            mHihgQualityImageUri=Uri.parse(savedInstanceState.getString("mHiUri"));
+        }
+        Log.d("API"," restoreInstance mediaUri "+mediaUri+" mHi: "+mHihgQualityImageUri);
+    }
+
     private void initInstance() {
 
         catListAdapter=new CatListAdapter();
@@ -195,9 +228,16 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         btnImgCam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                //if (intent.resolveActivity(getPackageManager()) != null) {}
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, "New Picture");
+                values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+                mediaUri = getContentResolver().insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mediaUri);
                 startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+
+
 
             }
         });
@@ -217,7 +257,19 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
 
 
     }
-
+    private void takePhoto(){
+        final Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getTempFile(this)) );
+        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+    }
+    private File getTempFile(Context context){
+        //it will return /sdcard/image.tmp
+        final File path = new File( Environment.getExternalStorageDirectory(), context.getPackageName() );
+        if(!path.exists()){
+            path.mkdir();
+        }
+        return new File(path, "image.tmp");
+    }
     private void sendPost(int category,String title,String content) {
         Log.d("API"," sending ");
         Call<PostItemDao> call = HttpManager.getInstance().getService().postNewPost(category,title,content,strImage,strVdo);
@@ -240,30 +292,50 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("API"," on Result "+resultCode+ " RESULT_OK "+RESULT_OK);
-        Uri u = data.getData();
-        Log.d("API"," before uploadFile resultCode:"+resultCode+" requestCode:"+requestCode);
+        Log.d("API"," on Result "+resultCode+ " RESULT_OK "+RESULT_OK+" request_code "+requestCode+" data:");
+        if(data!=null){
+            //Log.d("API","  data: "+data.getData());
+        }
+        try {
+            mediaUri = data.getData();
+        }catch (Exception e){
+            Log.e("API", "get data error "+e.getMessage());
+        }
+
+        Log.d("API"," before uploadFile resultCode:"+resultCode+" requestCode:"+requestCode+" mediaUri:"+mediaUri);
+
         if(resultCode==RESULT_OK){
             if(requestCode==PICK_IMAGE) {
-                u= data.getData();
+                mediaUri= data.getData();
                 Log.d("API"," uploading Image ");
             }
             if(requestCode==REQUEST_IMAGE_CAPTURE) {
-                Bundle extras = data.getExtras();
-                imgBitmap = (Bitmap) extras.get("data");
-                u=getImageUri(this,imgBitmap);
-                Log.d("API"," uploading from Camera Image ");
-                ivThumbImage.setImageBitmap(imgBitmap);
+                Log.d("API","uploading from Camera Image ");
+                ivThumbImage.setImageURI(mediaUri);
+                //mediaUri=data.getData();
+                //imgBitmap = android.provider.MediaStore.Images.Media.getBitmap(getContentResolver(), mediaUri);
+                //ivThumbImage.setImageBitmap(imgBitmap);
+
+
+
+                //Bundle extras = data.getExtras();
+                //imgBitmap = (Bitmap) extras.get("data");
+                //ivThumbImage.setImageBitmap(imgBitmap);
+                //Uri tempUri=getImageUri(this,imgBitmap);
+                //finalFile= new File(getRealPathFromURIPath(tempUri));
+
+                //ivThumbImage.setImageBitmap(imgBitmap);
+                //mediaUri=getImageUri(this,imgBitmap);
+
             }
             if(requestCode==REQUEST_VIDEO_CAPTURE){
-                u= data.getData();
+                mediaUri= data.getData();
                 Log.d("API"," uploading VDO ");
-
-
             }
-            uploadMultipart(getApplicationContext(),u,requestCode);
-        }
 
+        }
+        Log.d("API"," before upload mediaUri "+mediaUri);
+        uploadMultipart(getBaseContext(),mediaUri,requestCode);
         Log.d("API"," after uploadFile ");
 
     }
@@ -341,8 +413,8 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         progressBar.setProgress(100);
     }
 
-    private String getRealPathFromURIPath(Uri contentURI, Activity activity) {
-        Cursor cursor = activity.getContentResolver().query(contentURI, null, null, null, null);
+    private String getRealPathFromURIPath(Uri contentURI) {
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
         if (cursor == null) {
             return contentURI.getPath();
         } else {
@@ -391,16 +463,21 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                 Toast.LENGTH_SHORT).show();
     }
     public void uploadMultipart(final Context context,Uri fileUri, final int requestCode) {
+        if(fileUri==null) return;
+        Log.d("Upload","start uploadMultipart ");
         try {
-            Log.d("Upload","start uploadMultipart ");
-            Log.d("Upload","filUri:"+fileUri);
-            Log.d("Upload","filUri getPath:"+fileUri.getPath());
-            Log.d("Upload","filUri toString:"+fileUri.toString());
-            Log.d("uplaod","fileUri realpath"+getRealPathFromURIPath(fileUri,this));
-            File file = FileUtils.getFile(this, fileUri);
-            Log.d("API","file:"+file);
-            long fileSize=file.length();
+            //fileUri=mHihgQualityImageUri;
+            String filePath = fileUri.getPath();
 
+            Log.d("Upload","fileUri:"+fileUri);
+            Log.d("Upload","fileUri getPath: "+fileUri.getPath());
+            Log.d("Upload","fileUri toString: "+fileUri.toString());
+            Log.d("uplaod","fileUri realpath: "+getRealPathFromURIPath(fileUri));
+            File file = FileUtils.getFile(this, fileUri);
+            //file=finalFile;
+            Log.d("uplaod","file "+file);
+            Log.d("API","file:"+file);
+            long fileSize=fileUri.getPath().length();
             final String fileName=file.getName();
             Log.d("API"," filename:"+fileName);
             Log.d("API"," filesize:"+fileSize);
@@ -418,11 +495,15 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                 imgBitmap= ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(),MediaStore.Video.Thumbnails.MICRO_KIND);
                 ivThumbImage.setImageBitmap(imgBitmap);
             }
+
+            //getTempFile(this).getPath();
+
             //.setNotificationConfig(new UploadNotificationConfig())
+            filePath=getRealPathFromURIPath(fileUri);
             String uploadId =
                     new MultipartUploadRequest(context, "http://oliang.itban.com/upload")
                             // starting from 3.1+, you can also use content:// URI string instead of absolute file
-                            .addFileToUpload(getRealPathFromURIPath(fileUri,this), "userfile")
+                            .addFileToUpload(filePath, "userfile")
                             .setMaxRetries(3)
                             .setDelegate(new UploadStatusDelegate() {
                                 @Override
@@ -454,5 +535,35 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
             Log.e("AndroidUploadService", exc.getMessage(), exc);
         }
     }
+    private Uri generateTimeStampPhotoFileUri() {
 
+        Uri photoFileUri = null;
+        File outputDir = getPhotoDirectory();
+        if (outputDir != null) {
+            Time t = new Time(System.currentTimeMillis());
+            File photoFile = new File(outputDir, System.currentTimeMillis()
+                    + ".jpg");
+            photoFileUri = Uri.fromFile(photoFile);
+        }
+        return photoFileUri;
+    }
+    private File getPhotoDirectory() {
+        File outputDir = null;
+        String externalStorageStagte = Environment.getExternalStorageState();
+        if (externalStorageStagte.equals(Environment.MEDIA_MOUNTED)) {
+            File photoDir = Environment
+                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            outputDir = new File(photoDir, getString(R.string.app_name));
+            if (!outputDir.exists())
+                if (!outputDir.mkdirs()) {
+                    Toast.makeText(
+                            this,
+                            "Failed to create directory "
+                                    + outputDir.getAbsolutePath(),
+                            Toast.LENGTH_SHORT).show();
+                    outputDir = null;
+                }
+        }
+        return outputDir;
+    }
 }
