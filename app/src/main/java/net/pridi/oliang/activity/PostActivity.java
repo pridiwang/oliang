@@ -1,6 +1,7 @@
 package net.pridi.oliang.activity;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -8,8 +9,10 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 
 import android.media.MediaMetadataRetriever;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -35,8 +38,11 @@ import android.widget.Toast;
 import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.ServerResponse;
+import net.gotev.uploadservice.UploadInfo;
 import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadService;
+import net.gotev.uploadservice.UploadStatusDelegate;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
 import net.pridi.oliang.Manifest;
 import net.pridi.oliang.R;
@@ -84,16 +90,37 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
     private CatListAdapter catListAdapter;
     String catname;
     Uri selectedImage;
-    private Uri imageUri;
+    private Uri mediaUri;
+    String mediaStr;
+    private Bitmap imgBitmap;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+        if(savedInstanceState!=null){
+            strImage=savedInstanceState.getString("strImage");
+            strVdo=savedInstanceState.getString("strVdo");
+            imgBitmap=savedInstanceState.getParcelable("imgBitmap");
+            if(imgBitmap!=null){
 
+                Log.d("API"," got bitmap");
+            }else{
+                Log.d("API"," no bitmap");
+            }
+
+
+        }
         initInstance();
 
     }
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("strImage",strImage);
+        outState.putString("strVdo",strVdo);
+        outState.putParcelable("imgBitmap",imgBitmap);
 
+
+        super.onSaveInstanceState(outState);
+    }
     private void initInstance() {
 
         catListAdapter=new CatListAdapter();
@@ -131,6 +158,19 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         ivThumbImage= (ImageView) findViewById(R.id.ivThumbImage);
+        if(imgBitmap!=null){
+            ivThumbImage.setImageBitmap(imgBitmap);
+        }
+        ivThumbImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                //if (intent.resolveActivity(getPackageManager()) != null) {}
+                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+            }
+        });
+
+
         Button btnSubmit = (Button) findViewById(R.id.btnSubmit);
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -174,16 +214,18 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
 
             }
         });
+
+
     }
 
-    private void sendPost(int category,String title,String content,String image,String vdo) {
+    private void sendPost(int category,String title,String content) {
         Log.d("API"," sending ");
         Call<PostItemDao> call = HttpManager.getInstance().getService().postNewPost(category,title,content,strImage,strVdo);
         Log.d("API"," calling ");
         call.enqueue(new Callback<PostItemDao>() {
             @Override
             public void onResponse(Call<PostItemDao> call, Response<PostItemDao> response) {
-                Log.d("API","on Response");
+                Log.d("API","on Response strImage:"+strImage+" strVdo:"+strVdo);
                 finish();
             }
 
@@ -200,9 +242,6 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("API"," on Result "+resultCode+ " RESULT_OK "+RESULT_OK);
         Uri u = data.getData();
-
-        //String fileName=u.getLastPathSegment();
-
         Log.d("API"," before uploadFile resultCode:"+resultCode+" requestCode:"+requestCode);
         if(resultCode==RESULT_OK){
             if(requestCode==PICK_IMAGE) {
@@ -211,33 +250,18 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
             }
             if(requestCode==REQUEST_IMAGE_CAPTURE) {
                 Bundle extras = data.getExtras();
-                Bitmap imgBitmap = (Bitmap) extras.get("data");
+                imgBitmap = (Bitmap) extras.get("data");
                 u=getImageUri(this,imgBitmap);
                 Log.d("API"," uploading from Camera Image ");
                 ivThumbImage.setImageBitmap(imgBitmap);
             }
             if(requestCode==REQUEST_VIDEO_CAPTURE){
                 u= data.getData();
-                //pathToStoredVideo = getRealPathFromURIPath(u, PostActivity.this);
-                //uploadVideoToServer(pathToStoredVideo);
-
                 Log.d("API"," uploading VDO ");
-                /* show clip thumbnail
-                MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();
-                try {
-                    metadataRetriever.setDataSource(getRealPathFromURIPath(u,this));
-                    String duration=metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                    long time=Long.valueOf(duration)/2;
-                    Bitmap bitmap = metadataRetriever.getFrameAtTime(time, MediaMetadataRetriever.OPTION_NEXT_SYNC);
-                    ivThumbImage.setImageBitmap(bitmap);
 
-                    //now convert to base64
-                } catch (Exception ex) {
-                }
-                */
 
             }
-            uploadFile(u,requestCode);
+            uploadMultipart(getApplicationContext(),u,requestCode);
         }
 
         Log.d("API"," after uploadFile ");
@@ -287,9 +311,11 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                 }
                 if( requestCode ==REQUEST_IMAGE_CAPTURE){
                     strImage=fileName;
+                    Log.d("API","uploading strImage:"+fileName);
                 }
                 if( requestCode ==REQUEST_VIDEO_CAPTURE){
                     strVdo=fileName;
+                    Log.d("API","uploading strVdo:"+fileName);
                 }
             }
 
@@ -355,7 +381,7 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         String title = etTitle.getText().toString().trim();
         String content = etContent.getText().toString().trim();
         int category= catListAdapter.getDao().getData().get((spCatgeogry.getSelectedItemPosition())).getId();
-        sendPost(category,title,content,strImage,strVdo);
+        sendPost(category,title,content);
 
     }
 
@@ -363,6 +389,70 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         Toast.makeText(Contextor.getInstance().getContext(),
                 text,
                 Toast.LENGTH_SHORT).show();
+    }
+    public void uploadMultipart(final Context context,Uri fileUri, final int requestCode) {
+        try {
+            Log.d("Upload","start uploadMultipart ");
+            Log.d("Upload","filUri:"+fileUri);
+            Log.d("Upload","filUri getPath:"+fileUri.getPath());
+            Log.d("Upload","filUri toString:"+fileUri.toString());
+            Log.d("uplaod","fileUri realpath"+getRealPathFromURIPath(fileUri,this));
+            File file = FileUtils.getFile(this, fileUri);
+            Log.d("API","file:"+file);
+            long fileSize=file.length();
+
+            final String fileName=file.getName();
+            Log.d("API"," filename:"+fileName);
+            Log.d("API"," filesize:"+fileSize);
+            if( requestCode ==PICK_IMAGE){
+                strImage=fileName;
+            }
+            if( requestCode ==REQUEST_IMAGE_CAPTURE){
+                strImage=fileName;
+                Log.d("API","uploading strImage:"+strImage);
+
+            }
+            if( requestCode ==REQUEST_VIDEO_CAPTURE){
+                strVdo=fileName;
+                Log.d("API","uploading strVdo:"+fileName);
+                imgBitmap= ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(),MediaStore.Video.Thumbnails.MICRO_KIND);
+                ivThumbImage.setImageBitmap(imgBitmap);
+            }
+            //.setNotificationConfig(new UploadNotificationConfig())
+            String uploadId =
+                    new MultipartUploadRequest(context, "http://oliang.itban.com/upload")
+                            // starting from 3.1+, you can also use content:// URI string instead of absolute file
+                            .addFileToUpload(getRealPathFromURIPath(fileUri,this), "userfile")
+                            .setMaxRetries(3)
+                            .setDelegate(new UploadStatusDelegate() {
+                                @Override
+                                public void onProgress(Context context, UploadInfo uploadInfo) {
+                                    progressBar.setProgress(uploadInfo.getProgressPercent());
+                                    Log.d("Upload", "progress:"+uploadInfo.getProgressPercent());
+                                }
+
+                                @Override
+                                public void onError(Context context, UploadInfo uploadInfo, Exception exception) {
+                                    showToast(exception.getMessage());
+                                    Log.e("Upload",exception.getMessage());
+
+                                }
+
+                                @Override
+                                public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
+                                    progressBar.setProgress(100);
+                                    Log.d("Upload","complete uploadMultipart ");
+                                }
+
+                                @Override
+                                public void onCancelled(Context context, UploadInfo uploadInfo) {
+                                    Log.d("Upload","cancel uploadMultipart ");
+                                }
+                            })
+                            .startUpload();
+        } catch (Exception exc) {
+            Log.e("AndroidUploadService", exc.getMessage(), exc);
+        }
     }
 
 }

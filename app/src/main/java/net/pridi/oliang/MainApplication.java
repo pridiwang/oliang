@@ -5,6 +5,9 @@ import android.app.Application;
 import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 
 import net.gotev.uploadservice.UploadService;
+import net.gotev.uploadservice.okhttp.OkHttpStack;
+
+import okhttp3.OkHttpClient;
 
 /**
  * Created by pridi on 28-Mar-17.
@@ -19,10 +22,13 @@ public class MainApplication extends Application {
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
         // Or, you can define it manually.
         UploadService.NAMESPACE = "net.pridi.oliang";
+        OkHttpClient client=new OkHttpClient();
+        UploadService.HTTP_STACK=new OkHttpStack(client);
     }
 
     @Override 
     public void onTerminate() {
         super.onTerminate();
     }
+
 }
