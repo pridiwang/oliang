@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 
 import android.graphics.Path;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
@@ -111,17 +112,13 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
             imgBitmap=savedInstanceState.getParcelable("imgBitmap");
             if (savedInstanceState.containsKey("mediaUri")) {
                 mediaUri=Uri.parse(savedInstanceState.getString("mediaUri"));
+                //ivThumbImage.setImageURI(mediaUri);
 
             }
-            if (savedInstanceState.containsKey("mHiUri")) {
-                mHihgQualityImageUri=Uri.parse(savedInstanceState.getString("mHiUri"));
-
-            }
-            if(imgBitmap!=null){
-
-                Log.d("API"," got bitmap");
-            }else{
-                Log.d("API"," no bitmap");
+            if(savedInstanceState.containsKey("imgBitmap")){
+                imgBitmap=savedInstanceState.getParcelable("imgBitmap");
+                if(imgBitmap!=null)
+                    ivThumbImage.setImageBitmap(imgBitmap);
             }
 
 
@@ -136,7 +133,9 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         if(mediaUri!=null){
             outState.putString("mediaUri",mediaUri.toString());
         }
-        if(mHihgQualityImageUri!=null) outState.putString("mHiUri",mHihgQualityImageUri.toString());
+        if(imgBitmap!=null){
+            outState.putParcelable("imgBitmap",imgBitmap);
+        }
         Log.d("API"," saveInstance mediaUri "+mediaUri+" mHi: "+mHihgQualityImageUri);
         super.onSaveInstanceState(outState);
     }
@@ -146,10 +145,9 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState.containsKey("mediaUri")) {
             mediaUri=Uri.parse(savedInstanceState.getString("mediaUri"));
+            Log.d("API"," restore mediaUri:"+mediaUri);
+            //ivThumbImage.setImageURI(mediaUri);
 
-        }
-        if (savedInstanceState.containsKey("mHiUri")) {
-            mHihgQualityImageUri=Uri.parse(savedInstanceState.getString("mHiUri"));
         }
         Log.d("API"," restoreInstance mediaUri "+mediaUri+" mHi: "+mHihgQualityImageUri);
     }
@@ -194,16 +192,6 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         if(imgBitmap!=null){
             ivThumbImage.setImageBitmap(imgBitmap);
         }
-        ivThumbImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                //if (intent.resolveActivity(getPackageManager()) != null) {}
-                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-            }
-        });
-
-
         Button btnSubmit = (Button) findViewById(R.id.btnSubmit);
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -225,7 +213,7 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         });
 
         Button btnImgCam = (Button) findViewById(R.id.btnImgCam);
-        btnImgCam.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener onCamClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ContentValues values = new ContentValues();
@@ -233,14 +221,15 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                 values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
                 mediaUri = getContentResolver().insert(
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mediaUri);
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, mediaUri);
                 startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
 
 
-
             }
-        });
+        };
+        btnImgCam.setOnClickListener(onCamClickListener);
+        ivThumbImage.setOnClickListener(onCamClickListener);
 
 
         Button btnVdo = (Button) findViewById(R.id.btnVdo);
@@ -257,19 +246,7 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
 
 
     }
-    private void takePhoto(){
-        final Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getTempFile(this)) );
-        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-    }
-    private File getTempFile(Context context){
-        //it will return /sdcard/image.tmp
-        final File path = new File( Environment.getExternalStorageDirectory(), context.getPackageName() );
-        if(!path.exists()){
-            path.mkdir();
-        }
-        return new File(path, "image.tmp");
-    }
+
     private void sendPost(int category,String title,String content) {
         Log.d("API"," sending ");
         Call<PostItemDao> call = HttpManager.getInstance().getService().postNewPost(category,title,content,strImage,strVdo);
@@ -312,20 +289,7 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
             if(requestCode==REQUEST_IMAGE_CAPTURE) {
                 Log.d("API","uploading from Camera Image ");
                 ivThumbImage.setImageURI(mediaUri);
-                //mediaUri=data.getData();
-                //imgBitmap = android.provider.MediaStore.Images.Media.getBitmap(getContentResolver(), mediaUri);
-                //ivThumbImage.setImageBitmap(imgBitmap);
-
-
-
-                //Bundle extras = data.getExtras();
-                //imgBitmap = (Bitmap) extras.get("data");
-                //ivThumbImage.setImageBitmap(imgBitmap);
-                //Uri tempUri=getImageUri(this,imgBitmap);
-                //finalFile= new File(getRealPathFromURIPath(tempUri));
-
-                //ivThumbImage.setImageBitmap(imgBitmap);
-                //mediaUri=getImageUri(this,imgBitmap);
+                imgBitmap =((BitmapDrawable) ivThumbImage.getDrawable()).getBitmap();
 
             }
             if(requestCode==REQUEST_VIDEO_CAPTURE){
