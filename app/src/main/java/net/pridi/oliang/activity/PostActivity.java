@@ -80,8 +80,9 @@ import retrofit2.http.Multipart;
 public class PostActivity extends AppCompatActivity implements ProgressRequestBody.UploadCallbacks {
     public static final int PICK_IMAGE = 100;
     public static final int PICK_VDO = 200;
-    private static final int REQUEST_VIDEO_CAPTURE = 400;
     private static final int REQUEST_IMAGE_CAPTURE = 300;
+    private static final int REQUEST_VIDEO_CAPTURE = 400;
+
     EditText etTitle ;
     EditText etContent;
     private Spinner spCatgeogry;
@@ -284,6 +285,8 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         if(resultCode==RESULT_OK){
             if(requestCode==PICK_IMAGE) {
                 mediaUri= data.getData();
+                ivThumbImage.setImageURI(mediaUri);
+                imgBitmap =((BitmapDrawable) ivThumbImage.getDrawable()).getBitmap();
                 Log.d("API"," uploading Image ");
             }
             if(requestCode==REQUEST_IMAGE_CAPTURE) {

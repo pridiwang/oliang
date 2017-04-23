@@ -94,7 +94,7 @@
             android:layout_height="wrap_content"
 
             android:drawableLeft="@drawable/ic_image_black_18dp"
-            android:visibility="gone"
+            android:visibility="visible"
             android:text="รูป"
             ></Button>
         <Button android:id="@+id/btnImgCam"
