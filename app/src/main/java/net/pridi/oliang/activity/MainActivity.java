@@ -2,7 +2,9 @@ package net.pridi.oliang.activity;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.net.sip.SipAudioCall;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -16,10 +18,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.facebook.login.widget.LoginButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 
@@ -52,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
     CatListManager catListManager;
     MutableInteger categoryId;
     public Integer catid;
+    ImageView ivUser;
     FireBaseRegist fbRegist = new FireBaseRegist();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,10 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
         }else{
 
         }
+
+    }
+
+    private void initInstance() {
         btnPostNew = (Button) findViewById(R.id.btnPostNew);
         btnPostNew.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,10 +87,14 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
             }
         });
 
-
-    }
-
-    private void initInstance() {
+        ivUser = (ImageView) findViewById(R.id.ivUser);
+        ivUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this,LoginActivity.class);
+                startActivity(intent);
+            }
+        });
         FirebaseMessaging.getInstance().subscribeToTopic("newpost");
         categoryId= new MutableInteger(0);
         lvCatList = (ListView) findViewById(R.id.lvCatList);
@@ -196,5 +211,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
     public void setCatid(Integer catid) {
         this.catid = catid;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 }
