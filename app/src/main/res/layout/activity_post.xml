@@ -45,11 +45,13 @@
         />
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:orientation="horizontal">
+        android:layout_height="wrap_content" android:orientation="horizontal"
+        android:weightSum="1">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="หมวดหมู่"/>
+            android:text="หมวดหมู่"
+            android:layout_weight="0.08" />
     <Spinner
         android:id="@+id/spCategory"
         android:layout_width="wrap_content"
@@ -89,33 +91,40 @@
         android:orientation="horizontal"
 
         >
-        <Button android:id="@+id/btnImage"
-            android:layout_width="wrap_content"
+
+        <Button
+            android:id="@+id/btnImage"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
 
             android:drawableLeft="@drawable/ic_image_black_18dp"
-            android:visibility="visible"
-            android:text="รูป"
-            ></Button>
+            android:textAlignment="center"
+            android:visibility="visible"></Button>
+        <Button
+            android:id="@+id/btnUpVdo"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_play_circle_outline_black_18dp"
+            />
+
         <Button android:id="@+id/btnImgCam"
-            android:layout_width="wrap_content"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/ic_add_a_photo_black_18dp"
-            android:text="กล้อง"
+
             ></Button>
         <Button android:id="@+id/btnVdo"
-            android:layout_width="wrap_content"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/ic_video_call_black_18dp"
-            android:text="VDO"
+
             ></Button>
-    <Button
+        <Button
         android:id="@+id/btnSubmit"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_send_black_18dp"
-android:text="ส่ง"
-
+            android:textAlignment="center"
         />
 
     </LinearLayout>

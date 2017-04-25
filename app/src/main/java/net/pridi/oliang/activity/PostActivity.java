@@ -244,6 +244,17 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
 
             }
         });
+        Button btnUpVdo = (Button) findViewById(R.id.btnUpVdo);
+        btnUpVdo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("video/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select VDO"), PICK_VDO);
+
+            }
+        });
 
 
     }
@@ -381,13 +392,17 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
     }
 
     private String getRealPathFromURIPath(Uri contentURI) {
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) {
-            return contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(idx);
+        try {
+            Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+            if (cursor == null) {
+                return contentURI.getPath();
+            } else {
+                cursor.moveToFirst();
+                int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                return cursor.getString(idx);
+            }
+        }catch (Exception e){
+            return e.getMessage();
         }
     }
     public Uri getImageUri(Context inContext, Bitmap inImage) {
@@ -434,16 +449,19 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         Log.d("Upload","start uploadMultipart ");
         try {
             //fileUri=mHihgQualityImageUri;
+            Log.d("Upload","fileUri: "+fileUri);
             String filePath = fileUri.getPath();
-
-            Log.d("Upload","fileUri:"+fileUri);
-            Log.d("Upload","fileUri getPath: "+fileUri.getPath());
-            Log.d("Upload","fileUri toString: "+fileUri.toString());
-            Log.d("uplaod","fileUri realpath: "+getRealPathFromURIPath(fileUri));
+            Log.d("Upload","fileUri getPath: "+filePath);
+            String fileString=fileUri.toString();
+            Log.d("Upload","fileUri toString: "+fileString);
+            String fileRealPath=getRealPathFromURIPath(fileUri);
+            Log.d("upload","fileUri realPath: "+fileRealPath);
             File file = FileUtils.getFile(this, fileUri);
+            Log.d("upload","file :"+file);
+            Log.d("upload","file toString :"+file.toString());
             //file=finalFile;
-            Log.d("uplaod","file "+file);
-            Log.d("API","file:"+file);
+
+
             long fileSize=fileUri.getPath().length();
             final String fileName=file.getName();
             Log.d("API"," filename:"+fileName);
@@ -462,15 +480,22 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                 imgBitmap= ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(),MediaStore.Video.Thumbnails.MICRO_KIND);
                 ivThumbImage.setImageBitmap(imgBitmap);
             }
+            if( requestCode ==PICK_VDO){
+                strVdo=fileName;
+                Log.d("API","uploading strVdo:"+fileName);
+                imgBitmap= ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(),MediaStore.Video.Thumbnails.MICRO_KIND);
+                ivThumbImage.setImageBitmap(imgBitmap);
+                fileRealPath=file.toString();
+            }
 
             //getTempFile(this).getPath();
 
             //.setNotificationConfig(new UploadNotificationConfig())
-            filePath=getRealPathFromURIPath(fileUri);
+            //filePath=getRealPathFromURIPath(fileUri);
             String uploadId =
                     new MultipartUploadRequest(context, "http://oliang.itban.com/upload")
                             // starting from 3.1+, you can also use content:// URI string instead of absolute file
-                            .addFileToUpload(filePath, "userfile")
+                            .addFileToUpload(fileRealPath, "userfile")
                             .setMaxRetries(3)
                             .setDelegate(new UploadStatusDelegate() {
                                 @Override

@@ -58,7 +58,10 @@
             android:name="net.pridi.oliang.configuration.GlideConfiguration"
             android:value="GlideModule" />
 
-        <activity android:name=".activity.Mp4Activity" />
+        <activity android:name=".activity.Mp4Activity"
+            android:screenOrientation="landscape"
+
+            />
         <activity
             android:name=".activity.PostActivity"
             android:screenOrientation="portrait"></activity>
