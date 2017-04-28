@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "net.pridi.oliang"
         minSdkVersion 19
-        targetSdkVersion 22
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -39,12 +39,14 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'org.jsoup:jsoup:1.10.2'
     compile 'com.github.PierfrancescoSoffritti:AndroidYouTubePlayer:0.7.2'
-    compile 'com.google.firebase:firebase-core:10.0.1'
+    compile 'com.google.firebase:firebase-core:10.2.1'
     compile 'net.gotev:uploadservice:3.2.3'
     compile 'net.gotev:uploadservice-okhttp:3.2.3'
     compile 'com.google.firebase:firebase-messaging:10.2.1'
     compile 'com.google.firebase:firebase-auth:10.2.1'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+    compile 'com.google.android.exoplayer:exoplayer:r2.3.1'
+    compile 'net.ypresto.androidtranscoder:android-transcoder:0.2.0'
     testCompile 'junit:junit:4.12'
 }
 

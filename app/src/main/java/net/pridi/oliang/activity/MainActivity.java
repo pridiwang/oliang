@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
             startActivity(intent);
         }else if(dao.getMp4().length() >1) {
             Toast.makeText(this, "MP4 "+dao.getMp4(), Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(MainActivity.this, Mp4Activity.class);
+            Intent intent = new Intent(MainActivity.this, VdoActivity.class);
             intent.putExtra("dao",dao);
             startActivity(intent);
         }else{

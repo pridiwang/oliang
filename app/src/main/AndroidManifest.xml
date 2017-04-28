@@ -25,8 +25,13 @@
         android:resizeableActivity="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+
         android:theme="@style/AppTheme">
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+
         <service android:name=".utils.FireBaseRegist">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
@@ -44,7 +49,7 @@
         </activity>
         <activity
             android:name=".activity.MainActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.DetailActivity"
             android:screenOrientation="portrait"
@@ -58,17 +63,19 @@
             android:name="net.pridi.oliang.configuration.GlideConfiguration"
             android:value="GlideModule" />
 
-        <activity android:name=".activity.Mp4Activity"
-            android:screenOrientation="landscape"
-
-            />
+        <activity
+            android:name=".activity.Mp4Activity"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".activity.PostActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         {% includecode
         github_path="firebase/quickstart-android/messaging/app/src/main/AndroidManifest.xml"
         region_tag="fcm_default_icon" adjust_indentation="auto" github_link=True %}
-        <activity android:name=".activity.LoginActivity"></activity>
+        <activity android:name=".activity.LoginActivity" />
+        <activity android:name=".activity.VdoActivity"
+            android:screenOrientation="landscape"
+            ></activity>
     </application>
 
 </manifest>
