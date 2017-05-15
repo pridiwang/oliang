@@ -22,9 +22,9 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:resizeableActivity="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:fullBackupContent="@xml/backup1"
 
         android:theme="@style/AppTheme">
 
@@ -72,10 +72,13 @@
         {% includecode
         github_path="firebase/quickstart-android/messaging/app/src/main/AndroidManifest.xml"
         region_tag="fcm_default_icon" adjust_indentation="auto" github_link=True %}
-        <activity android:name=".activity.LoginActivity" />
+        <activity android:name=".activity.LoginActivity"
+            />
+
+
         <activity android:name=".activity.VdoActivity"
             android:screenOrientation="landscape"
-            ></activity>
+            />
     </application>
 
 </manifest>

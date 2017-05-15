@@ -188,8 +188,6 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                         spCatgeogry.setSelection(0);
                         //showToast("catname: "+catListAdapter.getDao().getData().get((spCatgeogry.getSelectedItemPosition())).getId());
                     }
-                }else{
-
                 }
             }
 
@@ -309,13 +307,14 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
             Log.d("API"," data null");
             //if(requestCode== REQUEST_IMAGE_CAPTURE) data.setData(imgUri);
             //return;
-        }
-        try {
-            mediaUri = data.getData();
-            String mediaPath=getRealPathFromURIPath(mediaUri);
+        }else {
+            try {
+                mediaUri = data.getData();
+                String mediaPath = getRealPathFromURIPath(mediaUri);
 
-        }catch (Exception e){
-            Log.e("API", "get data error "+e.getMessage());
+            } catch (Exception e) {
+                Log.e("API", "get data error " + e.getMessage());
+            }
         }
 
         Log.d("API"," before uploadFile resultCode:"+resultCode+" requestCode:"+requestCode+" mediaUri:"+mediaUri);
@@ -343,6 +342,7 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                     mediaUri= data.getData();
                     Log.d("API"," uploading VDO ");
                     if(vdoResize(data,requestCode)) {
+                        Log.d(TAG," resized");
                         //uploadMultipart(getBaseContext(), mediaUri, requestCode);
                     }
                     break;
@@ -350,7 +350,7 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                 case PICK_VDO:
                     mediaUri= data.getData();
                     if(vdoResize(data,requestCode)) {
-
+                        Log.d(TAG," resized");
                     }
                     break;
 
@@ -406,7 +406,7 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                 clipUri= Uri.fromFile(file);
                 Log.d(TAG,"new file:"+file+ " fileUri:"+clipUri);
                 uploadMultipart(getBaseContext(), clipUri, requestCode);
-                return ;
+
 
 /*                startActivity(new Intent(Intent.ACTION_VIEW)
                         .setDataAndType(uri, "video/mp4")
@@ -526,9 +526,11 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
                 int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
                 return cursor.getString(idx);
             }
+
         }catch (Exception e){
             return e.getMessage();
         }
+
     }
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -695,14 +697,14 @@ public class PostActivity extends AppCompatActivity implements ProgressRequestBo
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "MyApplication");
 
-        /**Create the storage directory if it does not exist*/
+        /* Create the storage directory if it does not exist */
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
                 return null;
             }
         }
 
-        /**Create a media file name*/
+        /*Create a media file name*/
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
         if (type == 1){

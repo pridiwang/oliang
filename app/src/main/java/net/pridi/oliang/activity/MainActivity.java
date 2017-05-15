@@ -70,9 +70,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.contentContainer, MainFragment.newInstance(),"main_fragment")
                     .commit();
-
-        }else{
-
         }
 
     }
@@ -103,6 +100,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
         catid=0;
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         drawerLayout= (DrawerLayout) findViewById(R.id.drawerLayout);
         actionBarDrawerToggle = new ActionBarDrawerToggle(
                 MainActivity.this,
@@ -110,9 +110,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
                 R.string.open_drawer,
                 R.string.close_drawer
         );
-        drawerLayout.setDrawerListener(actionBarDrawerToggle);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+
         Call<CatItemCollectionDao> call = HttpManager.getInstance().getService().loadCatList();
         call.enqueue(new Callback<CatItemCollectionDao>() {
             @Override
@@ -140,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
                             getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.contentContainer,fraginfo,"main_fragment")
                                     .commit();
-                            ;
                             drawerLayout.closeDrawers();
                         }
                     });
@@ -169,12 +167,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(actionBarDrawerToggle.onOptionsItemSelected(item)){
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-
-
+        return actionBarDrawerToggle.onOptionsItemSelected(item);
     }
 
     @Override

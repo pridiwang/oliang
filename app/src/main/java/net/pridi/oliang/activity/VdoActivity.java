@@ -159,7 +159,6 @@ public class VdoActivity extends AppCompatActivity {
         });
     }
     private void showToast(String text){
-        return;
         //Toast.makeText(Contextor.getInstance().getContext(),
         //               text,Toast.LENGTH_SHORT).show();
     }
