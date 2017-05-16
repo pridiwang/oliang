@@ -21,6 +21,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="FB Login"
+    android:textSize="20dp"
      />
     <Button
         android:id="@+id/btnLogout"
@@ -28,4 +29,44 @@
         android:layout_height="wrap_content"
         android:text="Logout"
         />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="60dp"
+        android:background="#eeeeee"
+        android:layout_margin="20dp"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Login with NBTC Email "
+            android:gravity="center"
+            android:textSize="24dp"
+            android:textColor="@color/colorPrimary"
+            />
+    <EditText
+        android:id="@+id/etEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:hint="Email"
+
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:inputType="textPassword"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/white"
+        />
+    </LinearLayout>
 </LinearLayout>
