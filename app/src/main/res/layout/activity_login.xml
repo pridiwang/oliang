@@ -42,7 +42,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Login with NBTC Email "
+            android:text="Internal Login  "
             android:gravity="center"
             android:textSize="24dp"
             android:textColor="@color/colorPrimary"
@@ -52,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
-        android:hint="Email"
+        android:hint="Username"
 
         />
     <EditText

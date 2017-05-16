@@ -1,6 +1,7 @@
 package net.pridi.oliang;
 
 import android.app.Application;
+import android.os.StrictMode;
 
 import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 
@@ -17,6 +18,8 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
         //init upload library
         Contextor.getInstance().init(getApplicationContext());
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
