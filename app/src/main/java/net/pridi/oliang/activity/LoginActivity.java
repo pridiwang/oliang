@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseUser;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -40,9 +41,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        mAuth=FirebaseAuth.getInstance();
         initInstance();
-        
-
     }
 
     private void initInstance() {
@@ -69,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
                 // ...
             }
         });
-        mAuth=FirebaseAuth.getInstance();
+
         btnLogout = (Button) findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,4 +133,6 @@ public class LoginActivity extends AppCompatActivity {
 
         finish();
     }
+
+
 }
