@@ -41,8 +41,14 @@ import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 
 import net.pridi.oliang.R;
 import net.pridi.oliang.dao.PostItemDao;
+import net.pridi.oliang.fragment.DetailFragment;
+import net.pridi.oliang.manager.HttpManager;
 
 import java.io.IOException;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class VdoActivity extends AppCompatActivity {
     SimpleExoPlayerView vdoPlayer;
@@ -157,6 +163,10 @@ public class VdoActivity extends AppCompatActivity {
                 finish();
             }
         });
+        dao.setUnread(0);
+        Call<Object> call= HttpManager.getInstance().getService().readPost(dao.getId());
+
+        call.enqueue(new EmptyCallback());
     }
     private void showToast(String text){
         //Toast.makeText(Contextor.getInstance().getContext(),
@@ -177,5 +187,16 @@ public class VdoActivity extends AppCompatActivity {
             finish();
         }
         return super.onKeyDown(keyCode, event);
+    }
+    public class EmptyCallback<T> implements Callback<T> {
+        @Override
+        public void onResponse(Call<T> call, Response<T> response) {
+
+        }
+
+        @Override
+        public void onFailure(Call<T> call, Throwable t) {
+
+        }
     }
 }

@@ -24,6 +24,8 @@ public class PostItemDao implements Parcelable{
     @SerializedName("yt") private String yt;
     @SerializedName("mp4") private String mp4;
     @SerializedName("vdo") private String vdo;
+    @SerializedName("unread") private int unread;
+    @SerializedName("viewed") private int viewed;
     public PostItemDao(){
 
     }
@@ -42,6 +44,8 @@ public class PostItemDao implements Parcelable{
         yt = in.readString();
         mp4 = in.readString();
         vdo = in.readString();
+        unread = in.readInt();
+        viewed=in.readInt();
     }
 
     @Override
@@ -57,6 +61,8 @@ public class PostItemDao implements Parcelable{
         dest.writeString(yt);
         dest.writeString(mp4);
         dest.writeString(vdo);
+        dest.writeInt(unread);
+        dest.writeInt(viewed);
     }
 
     @Override
@@ -159,6 +165,10 @@ public class PostItemDao implements Parcelable{
     public String getMp4() {
         return mp4;
     }
+    public int getUnread() {
+        return unread;
+    }
+    public int getViewed() {       return viewed;    }
 
     public void setMp4(String mp4) {
         this.mp4 = mp4;
@@ -170,4 +180,12 @@ public class PostItemDao implements Parcelable{
     public void setVdo(String vdo) {
         this.vdo = vdo;
     }
+    public void setUnread(int unread) {
+        this.unread = unread;
+    }
+    public void setViewed(int viewed) {
+        this.viewed = viewed;
+    }
+
+
 }

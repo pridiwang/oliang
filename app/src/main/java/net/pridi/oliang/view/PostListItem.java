@@ -2,6 +2,7 @@ package net.pridi.oliang.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -24,6 +25,7 @@ public class PostListItem extends BaseCustomViewGroup {
     TextView tvDetail;
     ImageView ivImg;
     TextView tvCatName;
+    ImageView ivUnread;
 
     public PostListItem(Context context) {
         super(context);
@@ -63,6 +65,7 @@ public class PostListItem extends BaseCustomViewGroup {
         tvDetail = (TextView) findViewById(R.id.tvDetail);
         ivImg=(ImageView) findViewById(R.id.ivImg);
         tvCatName=(TextView) findViewById(R.id.tvCategoryName);
+        ivUnread=(ImageView) findViewById(R.id.ivUnread);
 
     }
 
@@ -82,6 +85,12 @@ public class PostListItem extends BaseCustomViewGroup {
 
                 .into(ivImg);
 
+    }
+    public void setImgUnread(int text){
+        if(text==0){
+            ivUnread.setVisibility(GONE);
+
+        }
     }
 
 

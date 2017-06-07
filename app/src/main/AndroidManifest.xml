@@ -14,23 +14,20 @@
     <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT" />
     <uses-permission android:name="android.permission.CAPTURE_SECURE_VIDEO_OUTPUT" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
     {% includecode
     github_path="firebase/quickstart-android/messaging/app/src/main/AndroidManifest.xml"
     region_tag="firebase_service" adjust_indentation="auto" github_link=True %}
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup1"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:fullBackupContent="@xml/backup1"
-
         android:theme="@style/AppTheme">
-
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" />
+        android:name="com.facebook.sdk.ApplicationId"
+        android:value="@string/facebook_app_id" />
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -38,14 +35,9 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
-        <service
-            android:name=".MyFirebaseInstanceIDService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
-            </intent-filter>
-        </service>
+
         <service android:name=".utils.FireBaseRegist">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
@@ -61,12 +53,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.MainActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name=".activity.MainActivity" />
         <activity
             android:name=".activity.DetailActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppThemeWithActionBar" />
         <activity
             android:name=".activity.ClipActivity"
@@ -76,25 +65,25 @@
         <meta-data
             android:name="net.pridi.oliang.configuration.GlideConfiguration"
             android:value="GlideModule" />
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
         <activity
             android:name=".activity.Mp4Activity"
             android:screenOrientation="landscape" />
         <activity
             android:name=".activity.PostActivity"
-            android:screenOrientation="portrait"
             android:exported="true"
-            />
+            android:screenOrientation="portrait" />
         {% includecode
         github_path="firebase/quickstart-android/messaging/app/src/main/AndroidManifest.xml"
         region_tag="fcm_default_icon" adjust_indentation="auto" github_link=True %}
-        <activity android:name=".activity.LoginActivity"
-            />
-
-
-        <activity android:name=".activity.VdoActivity"
-            android:screenOrientation="landscape"
-            />
+        <activity android:name=".activity.LoginActivity" />
+        <activity
+            android:name=".activity.VdoActivity"
+            android:screenOrientation="landscape" />
+        <activity android:name=".activity.UniverseActivity"></activity>
     </application>
 
 </manifest>

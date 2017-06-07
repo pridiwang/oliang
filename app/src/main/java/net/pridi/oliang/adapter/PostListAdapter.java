@@ -83,6 +83,8 @@ public class PostListAdapter extends BaseAdapter {
         //item.setDetailText(dao.getContent());
         item.setCatName(dao.getCategory());
         item.setImgUrl(dao.getImg());
+        item.setImgUnread(dao.getUnread());
+
         if(position>lastPositionInteger.getValue()) {
             Animation anim = AnimationUtils.loadAnimation(parent.getContext(),
                     R.anim.up_from_bottom);

@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -35,7 +36,9 @@ import net.pridi.oliang.dao.CatItemCollectionDao;
 import net.pridi.oliang.dao.CatItemDao;
 import net.pridi.oliang.dao.PostItemDao;
 import net.pridi.oliang.datatype.MutableInteger;
+import net.pridi.oliang.fragment.DetailFragment;
 import net.pridi.oliang.fragment.MainFragment;
+import net.pridi.oliang.fragment.TodayFragment;
 import net.pridi.oliang.manager.CatListManager;
 import net.pridi.oliang.manager.HttpManager;
 import net.pridi.oliang.manager.http.ApiService;
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     Button btnPostNew;
+    Button btnToday;
     private ListView lvCatList;
     private CatListAdapter catListAdapter;
     CatListManager catListManager;
@@ -67,14 +71,30 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
         initInstance();
         if(savedInstanceState==null) {
             //categoryId.setValue(2);
+            //.add(R.id.contentContainer, MainFragment.newInstance(),"main_fragment")
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.contentContainer, MainFragment.newInstance(),"main_fragment")
+                    .add(R.id.contentContainer, TodayFragment.newInstance(),"today_fragment")
                     .commit();
         }
 
     }
 
     private void initInstance() {
+        btnToday = (Button) findViewById(R.id.btnToday);
+        btnToday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle=new Bundle();
+                categoryId.setValue(catid);
+                bundle.putInt("catid",catid);
+                TodayFragment fragmentToday= new TodayFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.contentContainer,fragmentToday,"today_fragment")
+                        .commit();
+                drawerLayout.closeDrawers();
+            }
+        });
+
         btnPostNew = (Button) findViewById(R.id.btnPostNew);
         btnPostNew.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,22 +192,31 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
     @Override
     public void onPostItemClicked(PostItemDao dao) {
-        // check for Detail ofr Clip
-        if(dao.getYt().length()>1){
-            Intent intent = new Intent(MainActivity.this, ClipActivity.class);
-            intent.putExtra("dao",dao);
-            startActivity(intent);
-        }else if(dao.getMp4().length() >1) {
-            Toast.makeText(this, "MP4 "+dao.getMp4(), Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(MainActivity.this, VdoActivity.class);
-            intent.putExtra("dao",dao);
-            startActivity(intent);
-        }else{
-            Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-            intent.putExtra("dao",dao);
-            startActivity(intent);
-        }
+        FrameLayout detailContainer= (FrameLayout) findViewById(R.id.detailContainer);
+        if(detailContainer==null) {
+            //mobile
 
+            // check for Detail ofr Clip
+            if (dao.getYt().length() > 1) {
+                Intent intent = new Intent(MainActivity.this, ClipActivity.class);
+                intent.putExtra("dao", dao);
+                startActivity(intent);
+            } else if (dao.getMp4().length() > 1) {
+                Toast.makeText(this, "MP4 " + dao.getMp4(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, VdoActivity.class);
+                intent.putExtra("dao", dao);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                intent.putExtra("dao", dao);
+                startActivity(intent);
+            }
+        }else{
+            //Tablet
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.detailContainer, DetailFragment.newInstance(dao))
+                    .commit();
+        }
 
 
 

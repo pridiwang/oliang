@@ -21,11 +21,22 @@
             android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             />
 
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="horizontal">
         <FrameLayout
     android:id="@+id/contentContainer"
-    android:layout_width="match_parent"
+    android:layout_width="0dp"
+android:layout_weight="1"
     android:layout_height="match_parent" />
+    <FrameLayout
+        android:id="@+id/detailContainer"
+        android:layout_width="0dp"
+        android:layout_weight="2"
+        android:layout_height="match_parent" />
+
+</LinearLayout>
+
     </LinearLayout>
     <LinearLayout
         android:orientation="vertical"
@@ -42,13 +53,11 @@
             android:src="@drawable/ic_person_black_48dp"
             android:background="@drawable/cirimg"
             />
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="S"
+            android:text="Splash"
             android:textSize="18dp"
             />
         <Button
@@ -57,7 +66,7 @@
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/ic_home_black_18dp"
             android:textSize="18dp"
-            android:text=""
+            android:text="หน้าแรก"
             />
         <Button
             android:id="@+id/btnPostNew"
@@ -65,23 +74,7 @@
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/ic_create_black_18dp"
             android:textSize="18dp"
-            android:text="Post"/>
-
-</LinearLayout>
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="ค้นหา"
-            android:layout_gravity="center"
-            />
-        <Button
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_search_black_18dp"
-            android:text="ค้นหา"
-            />
+            android:text="Post New"/>
 
         <ListView
             android:id="@+id/lvCatList"
@@ -96,20 +89,7 @@
 
         </ListView>
 
-    <TextView     android:layout_width="match_parent"     android:layout_height="wrap_content"
-    android:text="จักรวาลแอพ กสทช."
-    android:gravity="center"
-    android:textSize="20dp"
-    android:textColor="#888888"
-    />
-        <TextView     android:layout_width="match_parent"     android:layout_height="wrap_content"
-            android:text="เกี่ยวกับแอพโอเลี้ยง"
-            android:gravity="center"
-            android:textSize="20dp"
-            android:textColor="#888888"
-            />
 
-
-</LinearLayout>
+    </LinearLayout>
 
 </android.support.v4.widget.DrawerLayout>
